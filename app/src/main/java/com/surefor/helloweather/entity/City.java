@@ -1,13 +1,28 @@
 package com.surefor.helloweather.entity;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by ethan on 05/11/2015.
  */
 public class City {
+    @SerializedName("_id")
+    @Expose
     Long id ;
+
+
+    @SerializedName("name")
+    @Expose
     String name ;
+
+    @SerializedName("coord")
+    @Expose
+    Coordinate coord ;
+
+    @SerializedName("country")
+    @Expose
     String country ;
-    Coordinate coord = new Coordinate() ;
 
     public City() {
 
@@ -66,5 +81,9 @@ public class City {
 
     public void setLatitude(Double latitude) {
         coord.setLatitude(latitude) ;
+    }
+
+    public String getKey() {
+        return name + ", " + country ;
     }
 }

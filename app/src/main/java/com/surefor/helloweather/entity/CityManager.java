@@ -1,91 +1,94 @@
 package com.surefor.helloweather.entity;
 
 import android.content.res.AssetManager;
-import android.util.JsonReader;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
+ * manages City information below.
+ *  1) list of cities to retrieve weather data
+ *  2) city most recently retrieved.
+ *
  * Created by ethan on 05/11/2015.
  */
 public class CityManager {
     private static CityManager instance = null ;
     private final String LIST_CANADA = "city.list.ca.json" ;
     private final String LIST_US = "city.list.us.json" ;
+    private boolean isLoaded = false ;
 
     // private List<City> cities = new ArrayList<>() ;
     private Map<String, City> cities = new HashMap<>() ;
 
+    // Singleton implementation
     public synchronized  static CityManager instance() {
-
         if (instance == null ) {
             instance = new CityManager() ;
         }
-
         return instance ;
     }
 
+    // default constructor
     private CityManager() {
 
     }
 
+    /**
+     * purges city list
+     */
     public void clear() {
         cities.clear();
+        isLoaded = false ;
     }
 
+    /**
+     * shows how many city data loaded
+     * @return number of cities
+     */
     public Integer size() {
         return cities.size() ;
     }
 
+    /**
+     * loads a list of City class
+     * @param asset project Assetmanager
+     * @throws IOException
+     */
     public void load(AssetManager asset) throws IOException {
         assert(asset != null) ;
+        clear() ;
         load(new InputStreamReader(asset.open(LIST_CANADA))) ;
         load(new InputStreamReader(asset.open(LIST_US))) ;
     }
 
+    /**
+     *
+     * @param in
+     * @throws IOException
+     */
     private void load(InputStreamReader in) throws IOException {
-        JsonReader jsonReader = new JsonReader(in) ;
-        try {
-            jsonReader.beginArray();
-            while(jsonReader.hasNext()) {
-                load(jsonReader) ;
-            }
-            jsonReader.endArray();
-        } finally {
-            jsonReader.close();
+        Type listType = new TypeToken<List<City>>() {}.getType();
+        Gson gson = new GsonBuilder().create() ;
+        List<City> _cities = gson.fromJson(in, listType) ;
+
+        for(City city  : _cities) {
+            cities.put(city.getKey(), city) ;
         }
+
+        isLoaded = true ;
     }
 
-    private void load(JsonReader jsonReader) throws IOException {
-        City city = new City() ;
-
-        jsonReader.beginObject();
-        while(jsonReader.hasNext()) {
-            String name = jsonReader.nextName() ;
-            if("_id".equals(name)) {
-                city.setId(jsonReader.nextLong());
-            } else if("name".equals(name)) {
-                city.setName(jsonReader.nextString());
-            } else if("country".equals(name)) {
-                city.setCountry(jsonReader.nextString());
-            } else if("coord".equals(name)) {
-                jsonReader.beginObject();
-                while(jsonReader.hasNext()) {
-                    name = jsonReader.nextName() ;
-                    if("lon".equals(name)) {
-                        city.setLongitude(jsonReader.nextDouble());
-                    } else if("lat".equals(name)) {
-                        city.setLatitude(jsonReader.nextDouble());
-                    }
-                }
-                jsonReader.endObject();
-            }
-        }
-        jsonReader.endObject();
-
-        cities.put(city.getName() + "," + city.getCountry(), city) ;
+    public boolean isLoaded() {
+        return isLoaded ;
     }
+
 }

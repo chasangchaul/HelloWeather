@@ -1,31 +1,67 @@
 package com.surefor.helloweather;
 
+import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    Typeface fontMeteocons = null ;
+    Typeface fontGotham = null ;
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        View view = super.onCreateView(parent, name, context, attrs);
+        return updateFont(view, name, attrs) ;
+    }
+
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        View view = super.onCreateView(name, context, attrs);
+        return updateFont(view, name, attrs) ;
+    }
+
+    private View updateFont(View view, String name, AttributeSet attrs) {
+        View updated = view ;
+
+        if("TextView".equalsIgnoreCase(name)) {
+            updated = new TextView(this, attrs) ;
+            ((TextView)updated).setTypeface(fontGotham) ;
+        }
+
+        return updated ;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        if(getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        setContentView(R.layout.content_main);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fontMeteocons = Typeface.createFromAsset(getAssets(), "fonts/meteocons.ttf") ;
+        fontGotham = Typeface.createFromAsset(getAssets(), "fonts/gotham-light.ttf") ;
+
+        ViewGroup paranet = (ViewGroup) findViewById(R.id.layoutWeather) ;
+        View today = LayoutInflater.from(this).inflate(R.layout.today_weather, paranet) ;
+
+        // paranet.addView(today);
     }
 
     @Override
@@ -48,5 +84,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        switch (newConfig.orientation){
+            case Configuration.ORIENTATION_LANDSCAPE :
+                break ;
+            case Configuration.ORIENTATION_PORTRAIT :
+                break ;
+        }
+        super.onConfigurationChanged(newConfig);
     }
 }

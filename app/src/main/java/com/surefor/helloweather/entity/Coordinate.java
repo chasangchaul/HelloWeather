@@ -1,10 +1,18 @@
 package com.surefor.helloweather.entity;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by ethan on 05/11/2015.
  */
 public class Coordinate {
+    @SerializedName("lon")
+    @Expose
     Double longitude ;
+
+    @SerializedName("lat")
+    @Expose
     Double latitude ;
 
     public Coordinate() {
