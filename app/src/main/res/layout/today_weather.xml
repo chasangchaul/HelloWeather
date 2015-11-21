@@ -25,10 +25,10 @@
         android:layout_height="wrap_content"
         android:text="Sky is clear."
         android:id="@+id/txtDesc"
-        android:layout_alignParentBottom="true"
+        android:textSize="15dp"
+        android:layout_above="@+id/txtDetail"
         android:layout_toRightOf="@+id/txtUnit"
-        android:layout_toEndOf="@+id/txtUnit"
-        android:textSize="15dp" />
+        android:layout_toEndOf="@+id/txtUnit" />
 
     <TextView
         android:layout_width="wrap_content"

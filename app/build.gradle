@@ -25,4 +25,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
     compile files('libs/gson-2.4.jar')
+    compile files('libs/retrofit-2.0.0-beta2.jar')
+    compile files('libs/okhttp-2.5.0.jar')
+    compile files('libs/converter-gson-2.0.0-beta2.jar')
+    compile files('libs/okio-1.6.0.jar')
 }

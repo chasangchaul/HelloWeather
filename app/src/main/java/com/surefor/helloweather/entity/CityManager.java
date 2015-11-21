@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,14 @@ public class CityManager {
     // default constructor
     private CityManager() {
 
+    }
+
+    public List<String> getKeys() {
+        return new ArrayList<String>(cities.keySet()) ;
+    }
+
+    public City getCity(String key) {
+        return cities.get(key) ;
     }
 
     /**
