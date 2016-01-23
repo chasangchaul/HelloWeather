@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -87,25 +88,15 @@ public class MainActivity extends Activity {
 
         Button btnLoad = (Button) findViewById(R.id.btnLoad) ;
 
-
         btnLoad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AutoCompleteTextView tvCities = (AutoCompleteTextView) findViewById(R.id.txtCityList) ;
                 City city = CityManager.instance().getCity(tvCities.getText().toString()) ;
-                refreshWeather(city.getId()) ;
+
+                new WeatherTask().execute(city.getId()) ;
             }
         });
-    }
-
-    private void refreshWeather(Long id) {
-        currentId = id ;
-        OpenWeatherMapAPI api = new OpenWeatherMapAPI() ;
-        CurrentWeather currentWeather = api.getCurrentWeather(id) ;
-        // new WeatherTask().execute(currentId) ;
-
-        updateCurrentWeather(currentWeather) ;
-
     }
 
     @Override
@@ -151,9 +142,7 @@ public class MainActivity extends Activity {
     }
     private Integer FahrenheitToCelsisus(Double fahrenheit) {
         return  (int) ((5.0 / 9.0) * (fahrenheit - 32.0)) ;
-
     }
-
     private void updateCurrentWeather(CurrentWeather weather)
     {
         TextView tvTemplature = (TextView) findViewById(R.id.txtTemperature) ;
@@ -163,7 +152,8 @@ public class MainActivity extends Activity {
         tvDesc.setText(weather.getWeather().get(0).getDescription());
 
         TextView tvDetail = (TextView) findViewById(R.id.txtDetail) ;
-        tvDetail.setText("Wind: " + String.valueOf(weather.getWind().getSpeed()) + "m/h, Humidity: " + String.valueOf(weather.getMain().getHumidity()) + "%");
+        tvDetail.setText("Wind: " + String.valueOf(weather.getWind().getSpeed()) +
+                "m/h, Humidity: " + String.valueOf(weather.getMain().getHumidity()) + "%");
 
         TextView tvDate = (TextView) findViewById(R.id.txtDate) ;
         Date dtNow = new Date(weather.getDt() * 1000L) ;
@@ -171,5 +161,25 @@ public class MainActivity extends Activity {
         dtFormat.setTimeZone(TimeZone.getTimeZone("EST"));
         tvDate.setText(dtFormat.format(dtNow));
 
+    }
+
+    class WeatherTask extends AsyncTask<Long, Void, CurrentWeather>
+    {
+        @Override
+        protected CurrentWeather doInBackground(Long... params) {
+            Long cityId = params[0] ;
+
+            OpenWeatherMapAPI api = new OpenWeatherMapAPI() ;
+            CurrentWeather currentWeather = api.getCurrentWeather(cityId) ;
+
+            return currentWeather ;
+        }
+
+        @Override
+        protected void onPostExecute(CurrentWeather currentWeather) {
+            super.onPostExecute(currentWeather);
+
+            updateCurrentWeather(currentWeather) ;
+        }
     }
 }

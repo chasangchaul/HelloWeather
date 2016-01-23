@@ -3,8 +3,6 @@
     <string name="app_label">Hello Weather</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_splash">SplashActivity</string>
-    <string name="url_open_weather_map">api.openweathermap.org/data</string>
-    <string name="v_open_weather_map">2.5</string>
-    <string name="api_open_weather_map_current_weather">weather</string>
+    <string name="url_open_weather_map">http://api.openweathermap.org</string>
     <string name="key_open_weather_map">3cd3c05dc4ff13ba9967374dfd7ed852</string>
 </resources>
