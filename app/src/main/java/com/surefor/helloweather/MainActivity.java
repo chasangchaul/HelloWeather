@@ -1,15 +1,12 @@
 package com.surefor.helloweather;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -29,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     Typeface fontMeteocons = null ;
     Typeface fontGotham = null ;
@@ -69,21 +66,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
+
         setContentView(R.layout.content_main);
 
         fontMeteocons = Typeface.createFromAsset(getAssets(), "fonts/meteocons.ttf") ;
         fontGotham = Typeface.createFromAsset(getAssets(), "fonts/gotham-light.ttf") ;
 
-        ViewGroup paranet = (ViewGroup) findViewById(R.id.layoutWeather) ;
-        View today = LayoutInflater.from(this).inflate(R.layout.today_weather, paranet) ;
+        ViewGroup vgWeather = (ViewGroup) findViewById(R.id.layoutWeather) ;
 
-        // new WeatherTask().execute(6092122L) ;
-        refreshWeather() ;
-
-        gestureDetectorForCurrentWeahter = new GestureDetector(this, new GestureListener()) ;
+        for(int i = 0 ; i < vgWeather.getChildCount(); i++) {
+            View view = vgWeather.getChildAt(i) ;
+            if(view instanceof  TextView) {
+                ((TextView) view).setTypeface(fontGotham) ;
+            }
+        }
 
         AutoCompleteTextView tvCities = (AutoCompleteTextView) findViewById(R.id.txtCityList) ;
         ArrayAdapter<String> cities = new ArrayAdapter<>(this, R.layout.simple_list_item, CityManager.instance().getKeys()) ;
@@ -100,16 +96,16 @@ public class MainActivity extends AppCompatActivity {
                 refreshWeather(city.getId()) ;
             }
         });
-/*
-        today.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+    }
 
-                return gestureDetectorForCurrentWeahter.onTouchEvent(event) ;
+    private void refreshWeather(Long id) {
+        currentId = id ;
+        OpenWeatherMapAPI api = new OpenWeatherMapAPI() ;
+        CurrentWeather currentWeather = api.getCurrentWeather(id) ;
+        // new WeatherTask().execute(currentId) ;
 
-            }
-        });
-*/
+        updateCurrentWeather(currentWeather) ;
+
     }
 
     @Override
@@ -175,42 +171,5 @@ public class MainActivity extends AppCompatActivity {
         dtFormat.setTimeZone(TimeZone.getTimeZone("EST"));
         tvDate.setText(dtFormat.format(dtNow));
 
-    }
-
-    private void refreshWeather(Long id) {
-        currentId = id ;
-        new WeatherTask().execute(currentId) ;
-    }
-
-    private void refreshWeather() {
-        new WeatherTask().execute(currentId) ;
-    }
-
-    class WeatherTask extends AsyncTask<Long, Void, CurrentWeather> {
-        @Override
-        protected void onPostExecute(CurrentWeather currentWeather) {
-            super.onPostExecute(currentWeather);
-            updateCurrentWeather(currentWeather);
-        }
-
-        @Override
-        protected CurrentWeather doInBackground(Long... params) {
-            OpenWeatherMapAPI api = new OpenWeatherMapAPI() ;
-            CurrentWeather currentWeather = api.getCurrentWeather(params[0]) ;
-            return currentWeather ;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-    }
-
-    class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            refreshWeather() ;
-            return super.onDoubleTap(e);
-        }
     }
 }

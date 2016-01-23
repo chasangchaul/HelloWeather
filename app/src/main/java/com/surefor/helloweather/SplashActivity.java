@@ -20,6 +20,7 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE) ;
         setContentView(R.layout.activity_splash);
 
@@ -34,36 +35,38 @@ public class SplashActivity extends Activity {
         ProgressBar pb = (ProgressBar) findViewById(R.id.pbStatus) ;
         pb.getIndeterminateDrawable().setColorFilter(Color.YELLOW, PorterDuff.Mode.MULTIPLY) ;
 
-        new LoadCities(getAssets()).execute() ;
+        new CityListLoader(getAssets()).execute() ;
     }
 
-    class LoadCities extends AsyncTask<Void, Void, Integer>
+    class CityListLoader extends AsyncTask<Void, Void, Void>
     {
         AssetManager assetManager ;
 
-        public LoadCities(AssetManager assetManager) {
+        public CityListLoader(AssetManager assetManager) {
             this.assetManager = assetManager ;
         }
 
         @Override
-        protected Integer doInBackground(Void... params) {
-            CityManager manager = CityManager.instance() ;
+        protected Void doInBackground(Void... params) {
+            CityManager manager = CityManager.instance();
             try {
                 manager.load(assetManager);
             }
-            catch (IOException ex) {
-
+            catch (IOException e) {
+                e.printStackTrace();
             }
-            return manager.size() ;
+
+            return null ;
         }
 
-        @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class) ;
-            startActivity(intent);
 
-            finish();
+        @Override
+        protected void onPostExecute(Void value) {
+            super.onPostExecute(value);
+
+            Intent intent = new Intent(SplashActivity.this, MainActivity.class) ;
+            startActivity(intent) ;
+            finish() ;
         }
     }
 }
